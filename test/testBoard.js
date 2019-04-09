@@ -128,6 +128,21 @@ describe('BOARD', () => {
       coords2 = [[0, 0], [0, 1], [0, 2], [0, 3]];
       empty = [];
     });
+
+    it('should return an array of integers', () => {
+      expect(getRI(balls, 2)).to.be.an('array'); // returns an array
+      expect(getRI(coords, 2)
+        .filter(item => Number.isInteger(item)).length)
+        .to.be.equal(getRI(array, limit).length) // has only integer children
+    });
+    it('should have length equal to limit parameter if inputArray.length>0', () => {
+      expect(getRI(empty, 10).length).to.be.equal(0);
+      expect(getRI(coords, 2).length).to.be.equal(2);
+      expect(getRI(balls, 10).length).to.be.equal(10);
+    });
+    it('should contain duplicates if limit>inputArray.length', () => {
+      // prove existence of dupes when limit>inputArray.length
+    });
   });
 
   describe('getRandomUniqueIndexes', () => {
@@ -140,6 +155,21 @@ describe('BOARD', () => {
       coords = [[0, 0], [0, 1]];
       coords2 = [[0, 0], [0, 1], [0, 2], [0, 3]];
       empty = [];
+    });
+
+    it('should return an array of integers', () => {
+      expect(getRUI(balls, 2)).to.be.an('array'); // returns an array
+      expect(getRUI(coords, 2)
+        .filter(item => Number.isInteger(item)).length)
+        .to.be.equal(getRUI(array, limit).length) // has only integer children
+    });
+    it('should have length >=0 and (length<=limit || length<=inputArray.length)', () => {
+      expect(getRUI(empty, 10).length).to.be.equal(0); // empty array
+      expect(getRUI(coords, 10).length).to.be.equal(2); // array.length<limit
+      expect(getRUI(coords2, 2).length).to.be.equal(2); // array.length>limit
+    });
+    it('should never contain duplicates', () => {
+      // prove lack of dupes when limit>input.Array.length
     });
   });
 });
