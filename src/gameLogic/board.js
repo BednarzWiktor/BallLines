@@ -9,6 +9,10 @@ const generateBoard = () => {
 };
 
 const getFreeCoords = board => {
+  if (!Array.isArray(board))
+    throw Error('Provided input needs to be an array');
+  if (board.filter(row => row.length===board.length).length !== board.length)
+    throw Error('Provided array needs to be a square matrix');
   return board.reduce((outerAcc, outerItem, outerIndex) => {
           outerItem.reduce((innerAcc, innerItem, innerIndex) => {
             if (innerItem===0) {
@@ -21,10 +25,17 @@ const getFreeCoords = board => {
 };
 
 const getRandomNumber = limit => {
+  if (!Number.isInteger(limit)) throw Error('input needs to be an integer');
+  if (limit<0) throw Error('input needs to be a positive number');
   return Math.floor(Math.random() * limit);
 };
 
 const pushRandom = (array, limit, unique = false) => {
+  if (!Array.isArray(array)
+      || !Number.isInteger(limit)
+      || !(typeof unique==='boolean'))
+      throw Error('Wrong input, pass in proper parameters (array, integer, [boolean])');
+
   const random = getRandomNumber(limit);
   if (unique) {
     return array.includes(random) ? array : array.concat([random]);
@@ -34,6 +45,11 @@ const pushRandom = (array, limit, unique = false) => {
 };
 
 const getRandomIndexes = (inputArray, limit, baseArray = []) => {
+  if (!Array.isArray(inputArray)
+      || !Number.isInteger(limit)
+      || !Array.isArray(baseArray))
+      throw Error('Wrong input, pass in proper parameters (array, integer, array)');
+
   if (inputArray.length===0) {
     return [];
   } else {
@@ -44,6 +60,11 @@ const getRandomIndexes = (inputArray, limit, baseArray = []) => {
 };
 
 const getRandomUniqueIndexes = (inputArray, limit, baseArray = []) => {
+  if (!Array.isArray(inputArray)
+      || !Number.isInteger(limit)
+      || !Array.isArray(baseArray))
+      throw Error('Wrong input, pass in proper parameters (array, integer, array)');
+
   if (inputArray.length===0) {
     return [];
   } else if (inputArray.length<=limit) {
