@@ -99,7 +99,7 @@ describe('BOARD', () => {
       const handlers = [h1, h2, h3, h4];
 
       it('throws an error on taking input which is not an array', () => {
-        testTaskError(handlers), Error);
+        testTaskError(handlers, Error);
         testTaskError(handlers.slice(0,3), 'Provided input needs to be an array');
 
       });
