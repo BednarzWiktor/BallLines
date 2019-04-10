@@ -34,25 +34,25 @@ describe('BOARD', () => {
   describe('getFreeCoords', () => {
     const getFC = boardMethods.getFreeCoords;
 
-    let board, board2, board3;
-
-    before(() => {
-      board = [
-        ['r', 0, 'g'],
-        [0, 'b', 'b'],
-        ['r', 'r', 0]
-      ],
-      board2 = [
-        [0, 0],
-        [0, 0]
-      ],
-      board3 = [
-        ['r', 'g'],
-        ['b', 'r']
-      ]
-    });
-
     context('Valid Input', () => {
+      let board, board2, board3;
+
+      before(() => {
+        board = [
+          ['r', 0, 'g'],
+          [0, 'b', 'b'],
+          ['r', 'r', 0]
+        ],
+        board2 = [
+          [0, 0],
+          [0, 0]
+        ],
+        board3 = [
+          ['r', 'g'],
+          ['b', 'r']
+        ]
+      });
+
       it('should return a 2d array', () => {
         expect(getFC(board)).to.be.an('array'); // is an array
         expect(getFC(board)
@@ -140,16 +140,16 @@ describe('BOARD', () => {
   describe('pushRandom', () => {
     const pushR = boardMethods.pushRandom;
 
-    let array, array2, limit, limit2
-
-    before(() => {
-      array = [],
-      array1 = [0, 1],
-      limit = 2,
-      limit2 = 1;
-    });
-
     context('Valid Input', () => {
+      let array, array2, limit, limit2
+
+      before(() => {
+        array = [],
+        array1 = [0, 1],
+        limit = 2,
+        limit2 = 1;
+      });
+
       it('should return an array of integers', () => {
         expect(pushR(array, limit)).to.be.an('array'); // returns an array
         expect(pushR(array, limit)
@@ -183,16 +183,16 @@ describe('BOARD', () => {
   describe('getRandomIndexes', () => {
     const getRI = boardMethods.getRandomIndexes;
 
-    let balls, coords, coords2, empty;
-
-    before(() => {
-      balls = ['r', 'g', 'b'];
-      coords = [[0, 0], [0, 1]];
-      coords2 = [[0, 0], [0, 1], [0, 2], [0, 3]];
-      empty = [];
-    });
-
     context('Valid Input', () => {
+      let balls, coords, coords2, empty;
+
+      before(() => {
+        balls = ['r', 'g', 'b'];
+        coords = [[0, 0], [0, 1]];
+        coords2 = [[0, 0], [0, 1], [0, 2], [0, 3]];
+        empty = [];
+      });
+
       it('should return an array of integers', () => {
         expect(getRI(balls, 2)).to.be.an('array'); // returns an array
         expect(getRI(coords, 2)
@@ -227,16 +227,16 @@ describe('BOARD', () => {
   describe('getRandomUniqueIndexes', () => {
     const getRUI = boardMethods.getRandomUniqueIndexes;
 
-    let balls, coords, coords2, empty;
-
-    before(() => {
-      balls = ['r', 'g', 'b'];
-      coords = [[0, 0], [0, 1]];
-      coords2 = [[0, 0], [0, 1], [0, 2], [0, 3]];
-      empty = [];
-    });
-
     context('Valid Input', () => {
+      let balls, coords, coords2, empty;
+
+      before(() => {
+        balls = ['r', 'g', 'b'];
+        coords = [[0, 0], [0, 1]];
+        coords2 = [[0, 0], [0, 1], [0, 2], [0, 3]];
+        empty = [];
+      });
+
       it('should return an array of integers', () => {
         expect(getRUI(balls, 2)).to.be.an('array'); // returns an array
         expect(getRUI(coords, 2)
@@ -264,6 +264,59 @@ describe('BOARD', () => {
       it(`should throw an error if parameters don't correspond to (array, integer, array)`, () => {
         testTaskError(handlers, Error);
         testTaskError(handlers, 'Wrong input, pass in proper parameters (array, integer, array)');
+      });
+    });
+  });
+
+  describe('translateIndexes', () => {
+    const tI = boardMethods.translateIndexes;
+
+    context('Valid Input', () => {
+      let indexArray1, indexArray2, indexArray3, dictionary1, dictionary2, dictionary3;
+
+      before(() => {
+        indexArray1 = [];
+        indexArray2 = [0, 1];
+        indexArray3 = [1, 2, 1];
+        dictionary1 = ['r', 'g', 'b'];
+        dictionary2 = [[0, 0], [0, 1], [1, 0], [1, 1]];
+        dictionary3 = ['r', 'g', 'b', 'y', 'c'];
+      });
+
+      it('should return an array', () => {
+        expect(tI(indexArray1, dictionary1)).to.be.an('array');
+        expect(tI(indexArray2, dictionary2)).to.be.an('array');
+      });
+      it('should have length === indexArray.length', () => {
+        expect(tI(indexArray3, dictionary1).length).to.be.equal(indexArray3.length);
+      });
+      it('should match structure of dictionary parameter (each element of returned array can be found in dictionary)', () => {
+        expect(tI(indexArray2, dictionary1)
+          .filter(item => dictionary1.includes(item)).length)
+          .to.be.equal(tI(indexArray2, dictionary1).length)
+      });
+    });
+
+    context('Edge Cases', () => {
+      const h1 = () => tI('s', ['a']),
+            h2 = () => tI([], 1),
+            h3 = () => tI({}, 0.5),
+            h4 = () => tI([], []),
+            h5 = () => tI([10, 20], ['a']);
+
+      const handlers = [h1, h2, h3, h4, h5];
+
+      it(`should throw an error if parameters don't correspond to (array, array))`, () => {
+        testTaskError(handlers.slice(0,3), Error);
+        testTaskError(handlers.slice(0,3), 'Wrong input, pass in proper parameters (array, array)');
+      });
+      it(`should throw an error if dictionary is empty`, () => {
+        expect(handlers[3]).to.throw(Error);
+        expect(handlers[3]).to.throw(`dictionary parameter can't be empty`);
+      });
+      it('should throw an error if there are elements of indexArray exceeding dictionary index range', () => {
+        expect(handlers[4]).to.throw(Error);
+        expect(handlers[4]).to.throw(`indexArray elements exceeding dictionary index range`);
       });
     });
   });

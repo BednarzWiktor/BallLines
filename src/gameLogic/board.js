@@ -79,6 +79,17 @@ const getRandomUniqueIndexes = (inputArray, limit, baseArray = []) => {
   }
 };
 
+const translateIndexes = (indexArray, dictionary) => {
+  if (!Array.isArray(indexArray) || !Array.isArray(dictionary))
+    throw Error('Wrong input, pass in proper parameters (array, array)');
+  if (dictionary.length===0)
+    throw Error(`dictionary parameter can't be empty`);
+  if (indexArray.filter(index => index<dictionary.length).length!==indexArray.length)
+    throw Error(`indexArray elements exceeding dictionary index range`);
+
+  return indexArray.map(index => dictionary[index]);
+};
+
 const initialState = () => ({
   board: generateBoard(),
   level: 0,
@@ -86,4 +97,4 @@ const initialState = () => ({
   pendingCoords: []
 });
 
-module.exports = { generateBoard, getFreeCoords, getRandomNumber, pushRandom, getRandomIndexes, getRandomUniqueIndexes };
+module.exports = { generateBoard, getFreeCoords, getRandomNumber, pushRandom, getRandomIndexes, getRandomUniqueIndexes, translateIndexes };
