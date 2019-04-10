@@ -99,12 +99,11 @@ describe('BOARD', () => {
       const handlers = [h1, h2, h3, h4];
 
       it('throws an error on taking input which is not an array', () => {
-        testTaskError(handlers.slice(0,3), Error);
+        testTaskError(handlers), Error);
         testTaskError(handlers.slice(0,3), 'Provided input needs to be an array');
 
       });
       it('throws an error if an array does not have square dimensions', () => {
-        expect(handlers[3]).to.throw(Error);
         expect(handlers[3]).to.throw('Provided array needs to be a square matrix');
       });
     });
@@ -127,11 +126,10 @@ describe('BOARD', () => {
       const handlers = [h1, h2, h3];
 
       it('throws an error if input is not an integer', () => {
-        testTaskError(handlers.slice(0,2), Error);
+        testTaskError(handlers, Error);
         testTaskError(handlers.slice(0,2), 'input needs to be an integer');
       });
       it('throws an error if input is a negative number', () => {
-        expect(handlers[2]).to.throw(Error);
         expect(handlers[2]).to.throw('input needs to be a positive number');
       });
     });
@@ -307,15 +305,13 @@ describe('BOARD', () => {
       const handlers = [h1, h2, h3, h4, h5];
 
       it(`should throw an error if parameters don't correspond to (array, array))`, () => {
-        testTaskError(handlers.slice(0,3), Error);
+        testTaskError(handlers, Error);
         testTaskError(handlers.slice(0,3), 'Wrong input, pass in proper parameters (array, array)');
       });
       it(`should throw an error if dictionary is empty`, () => {
-        expect(handlers[3]).to.throw(Error);
         expect(handlers[3]).to.throw(`dictionary parameter can't be empty`);
       });
       it('should throw an error if there are elements of indexArray exceeding dictionary index range', () => {
-        expect(handlers[4]).to.throw(Error);
         expect(handlers[4]).to.throw(`indexArray elements exceeding dictionary index range`);
       });
     });
@@ -361,11 +357,10 @@ describe('BOARD', () => {
       const handlers = [h1, h2, h3, h4];
 
       it(`should throw an error if parameters don't correspond to (array, array)`, () => {
-        testTaskError(handlers.slice(0,3), Error);
+        testTaskError(handlers, Error);
         testTaskError(handlers.slice(0,3), 'Wrong input, pass in proper parameters (array, array)')
       });
       it(`should throw an error if coords.length!==colors.length`, () => {
-        expect(handlers[3]).to.throw(Error);
         expect(handlers[3]).to.throw('coords and colors parameters are not equal in legth');
       });
     });
@@ -426,15 +421,13 @@ describe('BOARD', () => {
       const handlers = [h1, h2, h3, h4];
 
       it(`should throw an error if parameters don't correspond to (array, array, string)`, () => {
-        testTaskError(handlers.slice(0,3), Error);
+        testTaskError(handlers, Error);
         testTaskError(handlers.slice(0,3), 'Wrong input, pass in proper parameters (array, array, string)');
       });
       it(`should throw an error if board parameter doesn't have proper size`, () => {
-        expect(handlers[3]).to.throw(Error);
         expect(handlers[3]).to.throw(`your board parameter doesn't have proper size (10x10)`);
       });
       it(`should throw an error if method parameter !== 'add' || !=='remove'`, () => {
-        expect(handlers[4]).to.throw(Error);
         expect(handlers[4]).to.throw(`your methods parameter doesn't equal 'add' or 'remove'`);
       });
     });
