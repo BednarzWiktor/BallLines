@@ -90,6 +90,22 @@ const translateIndexes = (indexArray, dictionary) => {
   return indexArray.map(index => dictionary[index]);
 };
 
+const createPendingCoords = (coords, colors) => {
+  if (!Array.isArray(coords) || !Array.isArray(colors))
+    throw Error('Wrong input, pass in proper parameters (array, array)');
+  if (coords.length!==colors.length)
+    throw Error('coords and colors parameters are not equal in legth');
+
+  return coords.reduce((acc, coord, i) => {
+    acc.push([coord, colors[i]]);
+    return acc;
+  }, []);
+};
+
+const updateBoard = (board, pendingCoords, method) => {
+ // ****************** WORK HERE **********************
+};
+
 const initialState = () => ({
   board: generateBoard(),
   level: 0,
@@ -97,4 +113,4 @@ const initialState = () => ({
   pendingCoords: []
 });
 
-module.exports = { generateBoard, getFreeCoords, getRandomNumber, pushRandom, getRandomIndexes, getRandomUniqueIndexes, translateIndexes };
+module.exports = { generateBoard, getFreeCoords, getRandomNumber, pushRandom, getRandomIndexes, getRandomUniqueIndexes, translateIndexes, createPendingCoords, updateBoard };

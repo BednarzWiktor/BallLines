@@ -320,4 +320,123 @@ describe('BOARD', () => {
       });
     });
   });
+
+  describe('createPendingCoords', () => {
+    const createPC = boardMethods.createPendingCoords;
+
+    context('Valid Input', () => {
+      let coords1, coords2, coords3, colors1, colors2, colors3;
+
+      before(() => {
+        coords1=[[0, 0]];
+        coords2=[[0, 0], [0, 1], [1, 1]];
+        coords3=[[5, 5], [9, 0], [2, 1]];
+        colors1=['r'];
+        colors2=['r', 'g', 'b'];
+        colors3=['y', 'y', 'y'];
+      });
+
+      it('should return a 2d array', () => {
+        expect(createPC(coords1, colors1)).to.be.an('array'); // is an array
+        expect(createPC(coords2, colors2)
+              .filter(item => Array.isArray(item)).length)
+              .to.be.equal(createPC(coords2, colors2).length); // has only array children
+      });
+      it('should have elements with structure [coords, color], where coords = [num, num] and color = string', () => {
+        expect(createPC(coords1, colors1)[0]).to.deep.equal([[0, 0], 'r']);
+        expect(createPC(coords2, colors2)[1]).to.deep.equal([[0, 1], 'g']);
+      });
+      it('should have length===coords.length===colors.length', () => {
+        expect(createPC(coords3, colors3).length).to.be.equal(coords3.length);
+        expect(createPC(coords3, colors3).length).to.be.equal(colors3.length);
+      });
+    });
+
+    context('Edge Cases', () => {
+      const h1 = () => createPC('s', []),
+            h2 = () => createPC([], 1),
+            h3 = () => createPC({}, true),
+            h4 = () => createPC([1, 2], [1]);
+
+      const handlers = [h1, h2, h3, h4];
+
+      it(`should throw an error if parameters don't correspond to (array, array)`, () => {
+        testTaskError(handlers.slice(0,3), Error);
+        testTaskError(handlers.slice(0,3), 'Wrong input, pass in proper parameters (array, array)')
+      });
+      it(`should throw an error if coords.length!==colors.length`, () => {
+        expect(handlers[3]).to.throw(Error);
+        expect(handlers[3]).to.throw('coords and colors parameters are not equal in legth');
+      });
+    });
+  });
+
+  describe('updateBoard', () => {
+    const updateB = boardMethods.updateBoard;
+    const genB = boardMethods.generateBoard;
+
+    context('Valid Input', () => {
+      context('add', () => {
+        let board, pendingCoords1, pendingCoords2;
+
+        before(() => {
+          board=genB();
+          pendingCoords1=[[[0, 0], 'r'], [[5, 5], 'b'], [[9, 9], 'g']];
+          pendingCoords2=[[[0, 0], 'b']];
+        });
+
+        it('should return a 2d array', () => {
+          expect(updateB(board, pendingCoords1, 'add')).to.be.an('array'); // is an array
+          expect(updateB(board, pendingCoords2, 'add')
+            .filter(item => Array.isArray(item)).length)
+            .to.be.equal(updateB(board, pendingCoords2, 'add').length); // has only array children
+        });
+        it('should be a square matrix', () => {
+          expect(updateB(board, pendingCoords2, 'add')
+            .filter(item => item.length===genB().length).length)
+            .to.be.equal(updateB(board, pendingCoords2).length); // has each row.length === col.length
+        });
+        it('should contain only 0 or string values', () => {
+          expect(updateB(board, pendingCoords2, 'add')
+            .filter(row => row.filter(item => item===0).length===genB().length).length)
+            .to.be.equal(updateB(board, pendingCoords2, 'add').length-1); // count 0's
+          expect(updateB(board, pendingCoords2, 'add')
+            .filter(row => row.filter(item => typeof item==='string').length===genB().length).length)
+            .to.be.equal(1); // count strings
+          expect(updateB(board, pendingCoords1, 'add')
+            .filter(row => row.filter(item => item===0).length===genB().length).length)
+            .to.be.equal(updateB(board, pendingCoords1, 'add').length-3); // count 0's
+          expect(updateB(board, pendingCoords1, 'add')
+            .filter(row => row.filter(item => typeof item==='string').length===genB().length).length)
+            .to.be.equal(3); // count strings
+        });
+      });
+      context('remove', () => {
+
+      });
+    });
+
+    context('Edge Cases', () => {
+      const h1 = () => updateB('s', [], 'add'),
+            h2 = () => updateB([], 1, 'add'),
+            h3 = () => updateB([], [], true),
+            h4 = () => updateB([], [], 'add'),
+            h5 = () => updateB(genB(), [], 'x');
+
+      const handlers = [h1, h2, h3, h4];
+
+      it(`should throw an error if parameters don't correspond to (array, array, string)`, () => {
+        testTaskError(handlers.slice(0,3), Error);
+        testTaskError(handlers.slice(0,3), 'Wrong input, pass in proper parameters (array, array, string)');
+      });
+      it(`should throw an error if board parameter doesn't have proper size`, () => {
+        expect(handlers[3]).to.throw(Error);
+        expect(handlers[3]).to.throw(`your board parameter doesn't have proper size (10x10)`);
+      });
+      it(`should throw an error if method parameter !== 'add' || !=='remove'`, () => {
+        expect(handlers[4]).to.throw(Error);
+        expect(handlers[4]).to.throw(`your methods parameter doesn't equal 'add' or 'remove'`);
+      });
+    });
+  });
 });
