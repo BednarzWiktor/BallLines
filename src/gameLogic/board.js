@@ -2,12 +2,54 @@
 const size = 10;
 const balls = () => ['r', 'g', 'b', 'y', 'c', 'm', 'o', 's', 'b'];
 
-// Board state manipulation
+/*****************************
+  BOARD STATE MANIPULATION
+******************************/
+
+// STATE.board methods
 const generateBoard = () => {
   const row = new Array(size).fill(0)
   return new Array(size).fill(row);
 };
 
+const updateBoard = (board, pendingCoords, method) => {
+  if (!Array.isArray(board) || !Array.isArray(pendingCoords) || typeof method!=='string')
+    throw Error('Wrong input, pass in proper parameters (array, array, string)');
+  if (board.length!==10)
+    throw Error(`your board parameter doesn't have proper size (10x10)`);
+  if (board.length!==board[0].length)
+    throw Error(`your board parameter doesn't have proper size (10x10)`);
+  if (!['add', 'remove'].includes(method))
+    throw Error(`your methods parameter doesn't equal 'add' or 'remove'`);
+
+  return board.reduce((acc, row, rowIndex) => {
+    const newRow = row.reduce((acc, item, itemIndex) => {
+      let match = 1;
+
+      if (method==='add') {
+        pendingCoords.map(coord => {
+          if (coord[0][0]===rowIndex && coord[0][1]===itemIndex) {
+            match = coord[1];
+          }
+        }, []);
+      } else if (method==='remove') {
+        pendingCoords.map(coord => {
+          if (coord[0]===rowIndex && coord[1]===itemIndex) {
+            match = 0;
+          }
+        }, []);
+      }
+
+      match!==1 ? acc.push(match) : acc.push(item);
+      return acc;
+    }, []);
+
+    acc.push(newRow);
+    return acc;
+  }, []);
+};
+
+// STATE.freeCoords methods
 const getFreeCoords = board => {
   if (!Array.isArray(board))
     throw Error('Provided input needs to be an array');
@@ -24,6 +66,7 @@ const getFreeCoords = board => {
         }, []);
 };
 
+// STATE.pendingCoords methods
 const getRandomNumber = limit => {
   if (!Number.isInteger(limit)) throw Error('input needs to be an integer');
   if (limit<0) throw Error('input needs to be a positive number');
@@ -102,43 +145,7 @@ const createPendingCoords = (coords, colors) => {
   }, []);
 };
 
-const updateBoard = (board, pendingCoords, method) => {
-  if (!Array.isArray(board) || !Array.isArray(pendingCoords) || typeof method!=='string')
-    throw Error('Wrong input, pass in proper parameters (array, array, string)');
-  if (board.length!==10)
-    throw Error(`your board parameter doesn't have proper size (10x10)`);
-  if (board.length!==board[0].length)
-    throw Error(`your board parameter doesn't have proper size (10x10)`);
-  if (!['add', 'remove'].includes(method))
-    throw Error(`your methods parameter doesn't equal 'add' or 'remove'`);
-
-  return board.reduce((acc, row, rowIndex) => {
-    const newRow = row.reduce((acc, item, itemIndex) => {
-      let match = 1;
-
-      if (method==='add') {
-        pendingCoords.map(coord => {
-          if (coord[0][0]===rowIndex && coord[0][1]===itemIndex) {
-            match = coord[1];
-          }
-        }, []);
-      } else if (method==='remove') {
-        pendingCoords.map(coord => {
-          if (coord[0]===rowIndex && coord[1]===itemIndex) {
-            match = 0;
-          }
-        }, []);
-      }
-
-      match!==1 ? acc.push(match) : acc.push(item);
-      return acc;
-    }, []);
-
-    acc.push(newRow);
-    return acc;
-  }, []);
-};
-
+// Global state handlers
 const initialState = () => ({
   board: generateBoard(),
   level: 0,
@@ -153,6 +160,7 @@ const initialState = () => ({
 const setState = (prevState) => ({
   board: updateBoard(prevState.board, prevState.pendingCoords(), 'add'),
   level: 0,
+  selected: [],
   freeCoords: function() {return getFreeCoords(this.board)},
   pendingCoords: function() {
     return createPendingCoords(
@@ -160,8 +168,6 @@ const setState = (prevState) => ({
       translateIndexes(getRandomIndexes(balls().slice(0, 3), 3), balls().slice(0, 3))
     )}
 });
-
-
 
 /*
   1. STARTTURN
