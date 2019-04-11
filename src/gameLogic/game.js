@@ -1,7 +1,7 @@
 'use strict'
 // Imports
 const pf = require('pathfinding');
-const board = require('board.js');
+const board = require('./board.js');
 
 // Constants
 const baseLevel = 10;
