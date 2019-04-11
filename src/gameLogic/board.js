@@ -1,6 +1,7 @@
 // Constants
 const size = 10;
-const balls = () => ['r', 'g', 'b', 'y', 'c', 'm', 'o', 's', 'b'];
+const balls = ['r', 'g', 'b', 'y', 'c', 'm', 'o', 's', 'b'];
+const levelBase = 10;
 
 /*****************************
   BOARD STATE MANIPULATION
@@ -144,30 +145,38 @@ const createPendingCoords = (coords, colors) => {
     return acc;
   }, []);
 };
+// STATE.level methods
+const progressLevel = state => {
+
+}
 
 // Global state handlers
-const initialState = () => ({
+const initialState = (level = 0) => ({
   board: generateBoard(),
-  level: 0,
+  level: level,
+  selected: [],
   freeCoords: function() {return getFreeCoords(this.board)},
   pendingCoords: function() {
     return createPendingCoords(
       translateIndexes(getRandomUniqueIndexes(this.freeCoords(), 5), this.freeCoords()),
-      translateIndexes(getRandomIndexes(balls().slice(0, 3), 5), balls().slice(0, 3))
+      translateIndexes(getRandomIndexes(balls.slice(0, 3), 5), balls.slice(0, 3))
     )}
 });
 
-const setState = (prevState) => ({
+const setState = prevState => ({
   board: updateBoard(prevState.board, prevState.pendingCoords(), 'add'),
-  level: 0,
+  level: prevState.level,
   selected: [],
   freeCoords: function() {return getFreeCoords(this.board)},
   pendingCoords: function() {
     return createPendingCoords(
       translateIndexes(getRandomUniqueIndexes(this.freeCoords(), 3), this.freeCoords()),
-      translateIndexes(getRandomIndexes(balls().slice(0, 3), 3), balls().slice(0, 3))
+      translateIndexes(getRandomIndexes(balls.slice(0, 3+this.level[0]), 3), balls.slice(0, 3+this.level[0]))
     )}
 });
+
+const test = setState(initialState());
+console.log(test);
 
 /*
   1. STARTTURN
@@ -199,4 +208,4 @@ const setState = (prevState) => ({
     - clear current pending balls ***(UPDATE STATE - pendingCoords)
 */
 
-module.exports = { generateBoard, getFreeCoords, getRandomNumber, pushRandom, getRandomIndexes, getRandomUniqueIndexes, translateIndexes, createPendingCoords, updateBoard };
+module.exports = { generateBoard, getFreeCoords, getRandomNumber, pushRandom, getRandomIndexes, getRandomUniqueIndexes, translateIndexes, createPendingCoords, updateBoard, initialState, setState };
