@@ -10,6 +10,7 @@ describe('BOARD', () => {
     });
   }
 
+  // Tests
   describe('generateBoard', () => {
     const genB = boardMethods.generateBoard;
 

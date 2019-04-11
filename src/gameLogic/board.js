@@ -171,4 +171,5 @@ const setState = (prevState, level = 0) => ({
     )}
 });
 
+// Exports
 module.exports = { generateBoard, getFreeCoords, getRandomNumber, pushRandom, getRandomIndexes, getRandomUniqueIndexes, translateIndexes, createPendingCoords, updateBoard, initialState, setState };
