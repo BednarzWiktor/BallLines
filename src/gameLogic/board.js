@@ -145,10 +145,6 @@ const createPendingCoords = (coords, colors) => {
     return acc;
   }, []);
 };
-// STATE.level methods
-const progressLevel = state => {
-
-}
 
 // Global state handlers
 const initialState = (level = 0) => ({
@@ -163,9 +159,9 @@ const initialState = (level = 0) => ({
     )}
 });
 
-const setState = prevState => ({
+const setState = (prevState, level = 0) => ({
   board: updateBoard(prevState.board, prevState.pendingCoords(), 'add'),
-  level: prevState.level,
+  level: level,
   selected: [],
   freeCoords: function() {return getFreeCoords(this.board)},
   pendingCoords: function() {
@@ -174,38 +170,5 @@ const setState = prevState => ({
       translateIndexes(getRandomIndexes(balls.slice(0, 3+this.level[0]), 3), balls.slice(0, 3+this.level[0]))
     )}
 });
-
-const test = setState(initialState());
-console.log(test);
-
-/*
-  1. STARTTURN
-    - create new pending balls ***(UPDATE STATE - pendingCoords)***
-    if (board has free spaces)
-      - wait for a player to select the ball
-      if (selected ball has got paths)
-        - wait for player to choose a path
-        - after player chose a path, check around the new position of a ball for possible matches of color
-          if (matches of color found)
-            - look for possible balls to remove
-            if (balls to remove exist)
-              - remove balls ***(UPDATE STATE - board+freeCoords)***
-              - start STARTTURN
-          else
-            - start ENDTURN
-      else
-        wait for a player to select another ball
-    else
-      end the game
-
-  2. ENDTURN
-    - spawn pending balls ***(UPDATE STATE - board+freeCoords)***
-    - check around the positions of spawned balls for possible matches
-    if (matches of color found)
-      - look for possible balls to remove
-      if (balls to remove exist)
-        - remove balls ***(UPDATE STATE - board+freeCoords)***
-    - clear current pending balls ***(UPDATE STATE - pendingCoords)
-*/
 
 module.exports = { generateBoard, getFreeCoords, getRandomNumber, pushRandom, getRandomIndexes, getRandomUniqueIndexes, translateIndexes, createPendingCoords, updateBoard, initialState, setState };
