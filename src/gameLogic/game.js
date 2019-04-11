@@ -17,3 +17,4 @@ const initialState = () => ({
 /*****************
   GAME MECHANICS
 ******************/
+// STATE.selection methods
