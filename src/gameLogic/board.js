@@ -103,14 +103,94 @@ const createPendingCoords = (coords, colors) => {
 };
 
 const updateBoard = (board, pendingCoords, method) => {
- // ****************** WORK HERE **********************
+  if (!Array.isArray(board) || !Array.isArray(pendingCoords) || typeof method!=='string')
+    throw Error('Wrong input, pass in proper parameters (array, array, string)');
+  if (board.length!==10)
+    throw Error(`your board parameter doesn't have proper size (10x10)`);
+  if (board.length!==board[0].length)
+    throw Error(`your board parameter doesn't have proper size (10x10)`);
+  if (!['add', 'remove'].includes(method))
+    throw Error(`your methods parameter doesn't equal 'add' or 'remove'`);
+
+  return board.reduce((acc, row, rowIndex) => {
+    const newRow = row.reduce((acc, item, itemIndex) => {
+      let match = 1;
+
+      if (method==='add') {
+        pendingCoords.map(coord => {
+          if (coord[0][0]===rowIndex && coord[0][1]===itemIndex) {
+            match = coord[1];
+          }
+        }, []);
+      } else if (method==='remove') {
+        pendingCoords.map(coord => {
+          if (coord[0]===rowIndex && coord[1]===itemIndex) {
+            match = 0;
+          }
+        }, []);
+      }
+
+      match!==1 ? acc.push(match) : acc.push(item);
+      return acc;
+    }, []);
+
+    acc.push(newRow);
+    return acc;
+  }, []);
 };
 
 const initialState = () => ({
   board: generateBoard(),
   level: 0,
-  freeCoords: this.board,
-  pendingCoords: []
+  freeCoords: function() {return getFreeCoords(this.board)},
+  pendingCoords: function() {
+    return createPendingCoords(
+      translateIndexes(getRandomUniqueIndexes(this.freeCoords(), 5), this.freeCoords()),
+      translateIndexes(getRandomIndexes(balls().slice(0, 3), 5), balls().slice(0, 3))
+    )}
 });
+
+const setState = (prevState) => ({
+  board: updateBoard(prevState.board, prevState.pendingCoords(), 'add'),
+  level: 0,
+  freeCoords: function() {return getFreeCoords(this.board)},
+  pendingCoords: function() {
+    return createPendingCoords(
+      translateIndexes(getRandomUniqueIndexes(this.freeCoords(), 3), this.freeCoords()),
+      translateIndexes(getRandomIndexes(balls().slice(0, 3), 3), balls().slice(0, 3))
+    )}
+});
+
+
+
+/*
+  1. STARTTURN
+    - create new pending balls ***(UPDATE STATE - pendingCoords)***
+    if (board has free spaces)
+      - wait for a player to select the ball
+      if (selected ball has got paths)
+        - wait for player to choose a path
+        - after player chose a path, check around the new position of a ball for possible matches of color
+          if (matches of color found)
+            - look for possible balls to remove
+            if (balls to remove exist)
+              - remove balls ***(UPDATE STATE - board+freeCoords)***
+              - start STARTTURN
+          else
+            - start ENDTURN
+      else
+        wait for a player to select another ball
+    else
+      end the game
+
+  2. ENDTURN
+    - spawn pending balls ***(UPDATE STATE - board+freeCoords)***
+    - check around the positions of spawned balls for possible matches
+    if (matches of color found)
+      - look for possible balls to remove
+      if (balls to remove exist)
+        - remove balls ***(UPDATE STATE - board+freeCoords)***
+    - clear current pending balls ***(UPDATE STATE - pendingCoords)
+*/
 
 module.exports = { generateBoard, getFreeCoords, getRandomNumber, pushRandom, getRandomIndexes, getRandomUniqueIndexes, translateIndexes, createPendingCoords, updateBoard };

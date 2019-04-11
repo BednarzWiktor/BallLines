@@ -372,7 +372,7 @@ describe('BOARD', () => {
 
     context('Valid Input', () => {
       context('add', () => {
-        let board, pendingCoords1, pendingCoords2;
+        let board,pendingCoords1, pendingCoords2;
 
         before(() => {
           board=genB();
@@ -389,25 +389,31 @@ describe('BOARD', () => {
         it('should be a square matrix', () => {
           expect(updateB(board, pendingCoords2, 'add')
             .filter(item => item.length===genB().length).length)
-            .to.be.equal(updateB(board, pendingCoords2).length); // has each row.length === col.length
+            .to.be.equal(updateB(board, pendingCoords2, 'add').length); // has each row.length === col.length
         });
         it('should contain only 0 or string values', () => {
           expect(updateB(board, pendingCoords2, 'add')
             .filter(row => row.filter(item => item===0).length===genB().length).length)
             .to.be.equal(updateB(board, pendingCoords2, 'add').length-1); // count 0's
           expect(updateB(board, pendingCoords2, 'add')
-            .filter(row => row.filter(item => typeof item==='string').length===genB().length).length)
+            .filter(row => row.filter(item => typeof item==='string').length===1).length)
             .to.be.equal(1); // count strings
           expect(updateB(board, pendingCoords1, 'add')
             .filter(row => row.filter(item => item===0).length===genB().length).length)
             .to.be.equal(updateB(board, pendingCoords1, 'add').length-3); // count 0's
           expect(updateB(board, pendingCoords1, 'add')
-            .filter(row => row.filter(item => typeof item==='string').length===genB().length).length)
+            .filter(row => row.filter(item => typeof item==='string').length===1).length)
             .to.be.equal(3); // count strings
         });
       });
       context('remove', () => {
-
+        const board = updateB(genB(), [[[0, 0], 'r'], [[5, 5], 'b'], [[9, 9], 'g']], 'add');
+        const pendingCoords = [[5, 5], [9, 9]];
+        it('should have x less string valued coords than input board, where x is pendingCoords parameter length', () => {
+          expect(updateB(board, pendingCoords, 'remove')
+            .filter(row => row.filter(item => typeof item==='string').length===1).length)
+            .to.be.equal(1); // count strings)
+        });
       });
     });
 
@@ -418,7 +424,7 @@ describe('BOARD', () => {
             h4 = () => updateB([], [], 'add'),
             h5 = () => updateB(genB(), [], 'x');
 
-      const handlers = [h1, h2, h3, h4];
+      const handlers = [h1, h2, h3, h4, h5];
 
       it(`should throw an error if parameters don't correspond to (array, array, string)`, () => {
         testTaskError(handlers, Error);
