@@ -147,11 +147,14 @@ const createPendingCoords = (coords, colors) => {
   }, []);
 };
 
+/*******************
+  STATE HANDLERS
+*******************/
+
 // Global state handlers
 const initialState = (level = 0) => ({
   board: generateBoard(),
   level: level,
-  selected: [],
   freeCoords: function() {return getFreeCoords(this.board)},
   pendingCoords: function() {
     return createPendingCoords(
@@ -163,7 +166,6 @@ const initialState = (level = 0) => ({
 const setState = (prevState, level = 0) => ({
   board: updateBoard(prevState.board, prevState.pendingCoords(), 'add'),
   level: level,
-  selected: [],
   freeCoords: function() {return getFreeCoords(this.board)},
   pendingCoords: function() {
     return createPendingCoords(
@@ -172,5 +174,13 @@ const setState = (prevState, level = 0) => ({
     )}
 });
 
+// Board state handlers
+const moveBall = (state, start, end) => {
+  const board = updateBoard(updateBoard(state.board, [start], 'remove'), [end], 'add');
+  console.log(`new board: ${board}`);
+
+  return Object.assign(state, {board: board});
+}
+
 // Exports
-module.exports = { generateBoard, getFreeCoords, getRandomNumber, pushRandom, getRandomIndexes, getRandomUniqueIndexes, translateIndexes, createPendingCoords, updateBoard, initialState, setState };
+module.exports = { generateBoard, getFreeCoords, getRandomNumber, pushRandom, getRandomIndexes, getRandomUniqueIndexes, translateIndexes, createPendingCoords, updateBoard, initialState, setState, moveBall };
