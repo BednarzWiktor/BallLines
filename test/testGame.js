@@ -106,4 +106,63 @@ describe('GAME', () => {
       });
     });
   });
+
+  describe('handleSelection', () => {
+    const iS = gameMethods.initialState;
+    const handleS = gameMethods.handleSelection;
+
+    context('Valid Input', () => {
+      let state1, state2;
+
+      beforeEach(() => {
+        const state = iS();
+        const statex = iS();
+
+        state1 = Object.assign(state, {selectionStart: [0, 0], selectionEnd: [[9, 9], 'r']});
+        state1.board.board[0][0] = 'r';
+        state1.board.board[9][9] = 0;
+
+        state2 = Object.assign(statex, {selectionStart: [0, 0], selectionEnd: [[9, 9], 'r']});
+        state2.board.board[0][0] = 'b';
+        state2.board.board[9][9] = 0;
+      });
+
+      it('should return an object', () => {
+        expect(handleS(state1)).to.be.an('object');
+        expect(handleS(state2)).to.be.an('object');
+      });
+      it('should return a valid game state object', () => {
+        expect(handleS(state1)).to.own.property('board');
+        expect(handleS(state1)).to.own.property('nextLevel');
+        expect(handleS(state1)).to.own.property('score');
+        expect(handleS(state1)).to.own.property('selectionStart');
+        expect(handleS(state1)).to.own.property('selectionEnd');
+      });
+      it('should have selectionStart and selectionEnd method se to empty array', () => {
+        expect(handleS(state1).selectionStart).to.not.deep.equal(state1.selectionStart);
+        expect(handleS(state1).selectionEnd).to.not.deep.equal(state1.selectionEnd);
+        expect(handleS(state2).selectionStart).to.not.deep.equal(state2.selectionStart);
+        expect(handleS(state2).selectionEnd).to.not.deep.equal(state2.selectionEnd);
+      });
+    });
+
+    context('Edge Cases', () => {
+      const h1 = () => handleS(true),
+            h2 = () => handleS(iS());
+            h3 = () => handleS(Object.assign(iS(), {selectionStart: [0, 0]}))
+
+      const handlers = [h1, h2, h3];
+
+      it(`throws an error if parameter does not correspond to object`, () => {
+        testTaskError(handlers, Error);
+        expect(handlers[0]).to.throw('Wrong input, pass in proper parameter (object)')
+      });
+      it('throws an error if selectionStart in input object is empty', () => {
+        expect(handlers[1]).to.throw('selectionStart in passed object is empty')
+      });
+      it('throws an error if selectionEnd in input object is emtpy', () => {
+        expect(handlers[2]).to.throw('selectionEnd in passed object is empty')
+      });
+    });
+  });
 });

@@ -28,7 +28,8 @@ const enqueueSelectionStart = (state, coords) => {
     throw Error(`coords parameter needs to hold valid coords`);
 
   if (state.board.board[coords[0]][coords[1]]!==0) {
-    return Object.assign(state, {selectionStart: coords});
+    const prevState = Object.assign({}, state);
+    return Object.assign(prevState, {selectionStart: coords});
   };
   return state;
 };
@@ -42,10 +43,30 @@ const enqueueSelectionEnd = (state, coords) => {
     throw Error(`coords parameter needs to hold valid coords`);
 
   if (state.selectionStart.length===2) {
-    return Object.assign(state, {selectionEnd: [coords, state.board.board[state.selectionStart[0]][state.selectionStart[1]]]});
+    const prevState = Object.assign({}, state);
+    return Object.assign(prevState, {selectionEnd: [coords, state.board.board[state.selectionStart[0]][state.selectionStart[1]]]});
   }
   return state;
 };
 
+const handleSelection = state => {
+  if (typeof state !== 'object')
+    throw Error('Wrong input, pass in proper parameter (object)');
+  if (state.selectionStart.length!==2)
+    throw Error('selectionStart in passed object is empty');
+  if (state.selectionEnd.length!==2)
+    throw Error('selectionEnd in passed object is empty');
 
-module.exports = { initialState, enqueueSelectionStart, enqueueSelectionEnd };
+  const prevState = Object.assign({}, state),
+        prevBoard = state.board,
+        prevStart = state.selectionStart,
+        prevEnd = state.selectionEnd;
+
+  return Object.assign(prevState, {
+    board: board.moveBall(prevBoard, prevStart, prevEnd),
+    selectionStart: [],
+    selectionEnd: []
+  });
+};
+
+module.exports = { initialState, enqueueSelectionStart, enqueueSelectionEnd, handleSelection };
