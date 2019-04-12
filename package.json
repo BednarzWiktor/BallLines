@@ -4,7 +4,6 @@
   "description": "Logic game which requires player to get as many points as possible before the game's board gets overwhelmed",
   "main": "app.js",
   "dependencies": {
-    "immutable": "^4.0.0-rc.12",
     "pathfinding": "^0.4.18"
   },
   "devDependencies": {
