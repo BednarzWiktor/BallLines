@@ -194,7 +194,6 @@ const moveBall = (state, start, end) => {
 
   const board = updateBoard(updateBoard(state.board, [start], 'remove'), [end], 'add');
   const test=state.pendingCoords();
-  console.log(test);
   return ({
     board: board,
     level: state.level,
