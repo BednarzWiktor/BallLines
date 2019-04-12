@@ -170,7 +170,7 @@ const setState = (prevState, level = 0) => ({
   pendingCoords: function() {
     return createPendingCoords(
       translateIndexes(getRandomUniqueIndexes(this.freeCoords(), 3), this.freeCoords()),
-      translateIndexes(getRandomIndexes(balls.slice(0, 3+this.level[0]), 3), balls.slice(0, 3+this.level[0]))
+      translateIndexes(getRandomIndexes(balls.slice(0, 3+this.level), 3), balls)
     )}
 });
 
@@ -193,7 +193,14 @@ const moveBall = (state, start, end) => {
     throw Error(`end parameter doesn't hold valid ball color`);
 
   const board = updateBoard(updateBoard(state.board, [start], 'remove'), [end], 'add');
-  return Object.assign(state, {board: board});
+  const test=state.pendingCoords();
+  console.log(test);
+  return ({
+    board: board,
+    level: state.level,
+    freeCoords: state.freeCoords,
+    pendingCoords: state.pendingCoords()
+  });
 }
 
 // Exports
