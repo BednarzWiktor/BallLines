@@ -30,7 +30,7 @@ const updateBoard = (board, pendingCoords, method) => {
       if (method==='add') {
         pendingCoords.map(coord => {
           if (coord[0][0]===rowIndex && coord[0][1]===itemIndex) {
-            if (item!==0)
+            if (item===0)
               match = coord[1];
           }
         }, []);
