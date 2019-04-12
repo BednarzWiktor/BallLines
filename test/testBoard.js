@@ -439,4 +439,70 @@ describe('BOARD', () => {
       });
     });
   });
+
+  describe('moveBall', () => {
+    const iS = boardMethods.initialState;
+    const sS = boardMethods.setState;
+    const mB = boardMethods.moveBall;
+
+    context('Valid Input', () => {
+      let state, start, end;
+
+      before(() => {
+        state = sS(iS());
+        state.board[0][0] = 'z';
+        state.board[9][9] = 0;
+
+        start = [0, 0];
+        end = [[9, 9], 'z'];
+      });
+
+      it('returns an object with same structure as state parameter', () => {
+        expect(mB(state, start, end)).to.be.an('object');
+        expect(mB(state, start, end)).to.own.property('board');
+        expect(mB(state, start, end)).to.own.property('level');
+        expect(mB(state, start, end)).to.own.property('freeCoords');
+        expect(mB(state, start, end)).to.own.property('pendingCoords');
+      });
+      it('changes value at start coords within state.board to 0', () => {
+        expect(mB(state, start, end).board[0][0]).to.be.equal(0);
+      });
+      it('changes value at end coords within state board to state.board[start]', () => {
+        expect(mB(state, start, end).board[9][9]).to.be.equal('z');
+      });
+    });
+
+    context('Edge Cases', () => {
+      let state = sS(iS());
+      delete state['level'];
+
+      const h1 = () => mB(true, [0, 0], [[9, 9], 'z']),
+            h2 = () => mB(sS(iS()), 1, [[9, 9], 'z']),
+            h3 = () => mB(sS(iS()), [0, 0], 'a'),
+            h4 = () => mB(.5, true, 'a'),
+            h5 = () => mB(state, [0, 0], [[9, 9], 'z']),
+            h6 = () => mB(sS(iS()), [0, 11], [[9, 9], 'z']),
+            h7 = () => mB(sS(iS()), [0, 0], [[-9, 9], 'z']),
+            h8 = () => mB(sS(iS()), [0, 0], [[9, 9], 'sa']);
+
+      const handlers = [h1, h2, h3, h4, h5, h6, h7, h8];
+
+      it(`throws an error if parameters don't correspond to (object, array, array)`, () => {
+        testTaskError(handlers, Error);
+        testTaskError(handlers.slice(0,4), 'Wrong input, pass in proper parameters (object, array, array)');
+      });
+      it(`throws an error if state parameter doesn't represent structure of board state`, () => {
+        expect(handlers[4]).to.throw(`your input state parameter doesn't reporesent board state`);
+      });
+      it(`throws an error if start doesn't hold valid coords`, () => {
+        expect(handlers[5]).to.throw(`start parameter doesn't represent valid board coords`);
+      });
+      it(`throws an error if end doesn't hold valid coords`, () => {
+        expect(handlers[6]).to.throw(`end parameter doesn't hold valid board coords`);
+      });
+      it(`throws an error if end doesn't hold valid string value`, () => {
+        expect(handlers[7]).to.throw(`end parameter doesn't hold valid ball color`);
+      });
+    });
+  });
 });

@@ -176,9 +176,23 @@ const setState = (prevState, level = 0) => ({
 
 // Board state handlers
 const moveBall = (state, start, end) => {
-  const board = updateBoard(updateBoard(state.board, [start], 'remove'), [end], 'add');
-  console.log(`new board: ${board}`);
+  if (typeof state !== 'object' ||
+      !Array.isArray(start) ||
+      !Array.isArray(end))
+    throw Error('Wrong input, pass in proper parameters (object, array, array)');
+  if (!('board' in state) ||
+      !('level' in state) ||
+      !('freeCoords' in state) ||
+      !('pendingCoords' in state))
+    throw Error(`your input state parameter doesn't reporesent board state`);
+  if (start.length!==2 || start.filter(num => num>=0 && num<10).length!==2)
+    throw Error(`start parameter doesn't represent valid board coords`);
+  if (end[0].length!==2 || end[0].filter(num => num>=0 && num<10).length!==2)
+    throw Error(`end parameter doesn't hold valid board coords`);
+  if (end[1].length!==1 && !balls.includes(end[1]))
+    throw Error(`end parameter doesn't hold valid ball color`);
 
+  const board = updateBoard(updateBoard(state.board, [start], 'remove'), [end], 'add');
   return Object.assign(state, {board: board});
 }
 
