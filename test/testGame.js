@@ -10,74 +10,99 @@ describe('GAME', () => {
     });
   }
 
-  describe('enqueueSelection', () => {
-    const enqS = gameMethods.enqueueSelection;
+  describe('enqueueSelectionStart', () => {
+    const initS = gameMethods.initialState;
+    const enqSS = gameMethods.enqueueSelectionStart;
 
     context('Valid Input', () => {
-      let state1, coords1, coords2, method1, method2;
+      let state1, coords1, coords2;
 
       before(() => {
-        state1={selectionStart: [], selectionEnd: []};
+        state1=initS();
         coords1=[0, 0];
         coords2=[9, 9];
-        method1='start';
-        method2='end';
       });
 
       it('should return an object', () => {
-        expect(enqS(state1, coords1, method1)).to.be.an('object');
-        expect(enqS(state1, coords2, method2)).to.be.an('object');
+        expect(enqSS(state1, coords1)).to.be.an('object');
+        expect(enqSS(state1, coords2)).to.be.an('object');
       });
       it('should maintain structure of input object', () => {
-        expect(enqS(state1, coords1, method1)).to.own('selectionStart');
-        expect(enqS(state1, coords2, method1)).to.own('selectionEnd');
-        expect(enqS(state1, coords2, method2)).to.own('selectionStart');
-        expect(enqS(state1, coords1, method2)).to.own('selectionEnd');
+        expect(enqSS(state1, coords1)).to.own.property('selectionStart');
+        expect(enqSS(state1, coords2)).to.own.property('selectionEnd');
+        expect(enqSS(state1, coords2)).to.own.property('selectionStart');
+        expect(enqSS(state1, coords1)).to.own.property('selectionEnd');
       });
 
-      context('method=start', () => {
-        it('should change only selectionStart key compared to input state', () => {
-          expect(enqS(state1, coords1, method1).selectionEnd)
-            .to.deep.equal(state1.selectionEnd);
-        });
-        it('should return an object with selectionStart value holding valid coords', () => {
-          expect(enqS(state1, coords1, method1).selectionStart)
-            .to.deep.equal(coords1);
-        });
-      });
-      context('method=end', () => {
-        it('should change only selectionEnd key compared to input state', () => {
-          expect(enqS(state1, coords2, method2).selectionStart)
-            .to.deep.equal(state1.selectionStart);
-        });
-        it('should return an object with selectionEnd value holding valid coords', () => {
-          expect(enqS(state1, coords2, method2).selectionEnd)
-            .to.deep.equal(coords2);
-        });
+      it('should change only selectionStart key compared to input state', () => {
+        expect(enqSS(state1, coords1).selectionEnd)
+          .to.deep.equal(state1.selectionEnd);
       });
     });
 
     context('Edge Cases', () => {
-      const h1 = () => enqS([], []),
-            h2 = () => enqS({}, 's'),
-            h3 = () => enqS(true, 1),
-            h4 = () => enqS({someKey: []}, [0, 0]),
-            h5 = () => enqS({selectionStart: [], selectionEnd: []}, ['s', 1]);
+      const h1 = () => enqSS(1, []),
+            h2 = () => enqSS({}, 's'),
+            h3 = () => enqSS(true, 1),
+            h4 = () => enqSS(initS(), ['s', true]);
 
-      const handlers = [h1, h2, h3, h4, h5];
+      const handlers = [h1, h2, h3, h4];
 
       it(`throws an error if parameters don't correspond to (object, array)`, () => {
         testTaskError(handlers, Error);
-        testTaskError(handlers.slice(0,3), 'Wrong input, pass in proper parameters (object, array, string)');
-      });
-      it(`throws an error if state parameter doesn't have proper structure`, () => {
-        expect(handlers[3]).to.throw(`Proper state object wasn't passed into the function`);
+        testTaskError(handlers.slice(0,3), 'Wrong input, pass in proper parameters (object, array)');
       });
       it(`throws an error if coords parameter doesn't hold valid coords`, () => {
         expect(handlers[3]).to.throw(`coords parameter needs to hold valid coords`);
-      })
-      it(`throws an error if method parameter !== 'start' || 'end'`, () => {
-        expect(handlers[3]).to.throw(`method parameter needs to have 'start' or 'end' value`);
+      });
+    });
+  });
+
+  describe('enqueueSelectionEnd', () => {
+    const initS = gameMethods.initialState;
+    const enqSE = gameMethods.enqueueSelectionEnd;
+
+    context('Valid Input', () => {
+      let state, coords1, coords2;
+
+      before(() => {
+        state=initS();
+        state.board.board[1][1] = 'r';
+        state.selectionStart = [1, 1];
+        coords1=[[0, 0], 'r'];
+        coords2=[[9, 9], 'r'];
+      });
+
+      it('should return an object', () => {
+        expect(enqSE(state, coords1)).to.be.an('object');
+        expect(enqSE(state, coords2)).to.be.an('object');
+      });
+      it('should maintain structure of input object', () => {
+        expect(enqSE(state, coords1)).to.own.property('selectionStart');
+        expect(enqSE(state, coords2)).to.own.property('selectionEnd');
+        expect(enqSE(state, coords2)).to.own.property('selectionStart');
+        expect(enqSE(state, coords1)).to.own.property('selectionEnd');
+      });
+      it('should change only selectionEnd key compared to input state', () => {
+        expect(enqSE(state, coords1).selectionStart)
+          .to.deep.equal(state.selectionStart);
+      });
+    });
+
+    context('Edge Cases', () => {
+      const h1 = () => enqSE(1, []),
+            h2 = () => enqSE({}, 's'),
+            h3 = () => enqSE(true, 1),
+            h4 = () => enqSE(initS(), ['s', true]);
+
+      const handlers = [h1, h2, h3, h4];
+
+      it(`throws an error if parameters don't correspond to (object, array)`, () => {
+        testTaskError(handlers, Error);
+        testTaskError(handlers.slice(0,3), 'Wrong input, pass in proper parameters (object, array)');
+      });
+      it(`throws an error if coords parameter doesn't hold valid coords`, () => {
+        expect(handlers[3]).to.throw(`coords parameter needs to hold valid coords`);
       });
     });
   });
