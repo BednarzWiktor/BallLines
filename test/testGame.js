@@ -148,20 +148,76 @@ describe('GAME', () => {
 
     context('Edge Cases', () => {
       const h1 = () => handleS(true),
-            h2 = () => handleS(iS());
-            h3 = () => handleS(Object.assign(iS(), {selectionStart: [0, 0]}))
+            h2 = () => handleS({someKey: ''}),
+            h3 = () => handleS(iS()),
+            h4 = () => handleS(Object.assign(iS(), {selectionStart: [0, 0]}));
 
-      const handlers = [h1, h2, h3];
+      const handlers = [h1, h2, h3, h4];
 
       it(`throws an error if parameter does not correspond to object`, () => {
         testTaskError(handlers, Error);
         expect(handlers[0]).to.throw('Wrong input, pass in proper parameter (object)')
       });
+      it(`throws an error if input object doesn't have valid state structure`, () => {
+        expect(handlers[1]).to.throw(`input object doesn't represent game state`);
+      });
       it('throws an error if selectionStart in input object is empty', () => {
-        expect(handlers[1]).to.throw('selectionStart in passed object is empty')
+        expect(handlers[2]).to.throw('selectionStart in passed object is empty')
       });
       it('throws an error if selectionEnd in input object is emtpy', () => {
-        expect(handlers[2]).to.throw('selectionEnd in passed object is empty')
+        expect(handlers[3]).to.throw('selectionEnd in passed object is empty')
+      });
+    });
+  });
+
+  describe('findPath', () => {
+    const iS = gameMethods.initialState;
+    const fP = gameMethods.findPath;
+
+    context('Valid Input', () => {
+      let state1, state2;
+
+      before(() => {
+        state1 = iS();
+        state1.board.board[0][0] = 'r';
+        state1.board.board[9][9] = 0;
+        state1.selectionStart = [0, 0];
+        state1.selectionEnd = [[9, 9], 'r'];
+
+        state2 = iS();
+        state2.board.board[0][0] = 'g';
+        state2.board.board[0][1] = 'g';
+        state2.board.board[1][0] = 'g';
+        state2.board.board[1][1] = 'g';
+        state2.board.board[2][2] = 0;
+        state2.selectionStart = [0, 0];
+        state2.selectionEnd = [[2, 2], 'g'];
+      });
+
+      it('should return an array', () => {
+        expect(fP(state1)).to.be.an('array');
+        expect(fP(state2)).to.be.an('array');
+      });
+      it('should be empty when no paths are found', () => {
+        expect(fP(state2).length).to.be.equal(0);
+      });
+      it('should contain arrays of coordinates defining a path from start to end if a path is found', () => {
+        expect(fP(state1).length).to.be.above(0);
+      });
+    });
+
+    context('Edge Cases', () => {
+      const h1 = () => fP(true),
+            h2 = () => fP({ board: 'board', someKey: 1});
+
+      const handlers = [h1, h2];
+
+      it(`throws an error if parameter does not correspond to an object`, () => {
+          testTaskError(handlers, Error);
+          expect(handlers[0]).to.throw('Wrong input, pass in proper parameter (object)');
+      });
+      it(`throws an error if input object doesn't have valid state structure`, () => {
+        expect(handlers[1]).to.throw(`input object doesn't represent game state`);
       });
     });
   });

@@ -1,14 +1,14 @@
 'use strict'
 // Imports
-const pf = require('pathfinding');
+const PF = require('pathfinding');
 const board = require('./board.js');
 
 // Constants
-const baseLevel = 10;
+const baseLevel = 5;
 
 const initialState = () => ({
   board: board.setState(board.initialState()),
-  nextLevel: baseLevel,
+  nextLevel: baseLevel*2,
   score: 0,
   selectionStart: [],
   selectionEnd: []
@@ -52,6 +52,12 @@ const enqueueSelectionEnd = (state, coords) => {
 const handleSelection = state => {
   if (typeof state !== 'object')
     throw Error('Wrong input, pass in proper parameter (object)');
+  if (!('board' in state) ||
+      !('nextLevel' in state) ||
+      !('score' in state) ||
+      !('selectionStart' in state) ||
+      !('selectionEnd' in state))
+    throw Error(`input object doesn't represent game state`);
   if (state.selectionStart.length!==2)
     throw Error('selectionStart in passed object is empty');
   if (state.selectionEnd.length!==2)
@@ -69,4 +75,26 @@ const handleSelection = state => {
   });
 };
 
-module.exports = { initialState, enqueueSelectionStart, enqueueSelectionEnd, handleSelection };
+const findPath = state => {
+  if (typeof state !== 'object')
+    throw Error('Wrong input, pass in proper parameter (object)');
+  if (!('board' in state) ||
+      !('nextLevel' in state) ||
+      !('score' in state) ||
+      !('selectionStart' in state) ||
+      !('selectionEnd' in state))
+    throw Error(`input object doesn't represent game state`);
+
+  const walkabilityMatrix = new PF.Grid(state.board.board
+    .map(row => row.map(item => item===0 ? item : 1)));
+  return new PF.AStarFinder({allowDiagonal: false})
+    .findPath(
+      state.selectionStart[0],
+      state.selectionStart[1],
+      state.selectionEnd[0][0],
+      state.selectionEnd[0][1],
+      walkabilityMatrix
+  );
+};
+
+module.exports = { initialState, enqueueSelectionStart, enqueueSelectionEnd, handleSelection, findPath };
