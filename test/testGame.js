@@ -223,13 +223,16 @@ describe('GAME', () => {
   });
 
   describe('checkCell', () => {
-    const directions = gameMethods.directions;
+    const directions = [[-1, -1], [-1, 0], [-1, 1],
+                        [0, -1],  /* x */  [0, 1],
+                        [1, -1],  [1, 0],  [1, 1]];
     const checkC = gameMethods.checkCell;
 
     context('Valid Input', () => {
       let board1, board2, board3, coords1, coords2, coords3, coords4, coords5, coords6, coords7, coords8, coords9;
 
       before(() => {
+        // UPDATE BOARD1-3 TO REPRESENT VALID 10x10 BOARD
         board1 = [['r', 'r', 'g'],
                   ['b', 'b', 'r'],
                   ['b', 'b', 'r']];
@@ -264,7 +267,7 @@ describe('GAME', () => {
       });
       it('if no balls of same color are found in neightbour cells, it is empty', () => {
         expect(checkC(board2, coords9).length).to.be.equal(0);
-        expect(chechC(board1, coords2).length).to.be.equal(0);
+        expect(checkC(board1, coords2).length).to.be.equal(0);
       });
       it('if balls of same color are in neighbour cells, it contains relative directions to found matches', () => {
         expect(checkC(board1, coords1).length).to.be.equal(1);

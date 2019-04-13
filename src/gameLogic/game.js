@@ -102,7 +102,35 @@ const findPath = state => {
 };
 
 const checkCell = (board, coords) => {
+  if (!Array.isArray(board) ||
+      !Array.isArray(coords))
+    throw Error('Wrong input, pass in proper parameters (array, array)');
+  // TEMPORARY ERROR HANDLER
+  if (board.length>0) {
+    if (Array.isArray(board[0])) {
+      if (board.length!==board[0].length) {
+        throw Error(`board doesn't represent game board matrix`);
+      }
+    }
+  }
+  if (coords.length!==2 ||
+      coords.filter(num => num>=0 && num<10).length!==2)
+    throw Error(`coords parameter needs to hold valid coords`);
 
+  const ball = board[coords[0]][coords[1]];
+  const adjustedDirections = directions
+    .map(
+      dir => [dir[0]+coords[0], dir[1]+coords[1]])
+    .filter(
+      dir => !(dir[0]>9||dir[0]<0||dir[1]>9||dir[1]<0)
+  );
+
+  return adjustedDirections
+    .filter(
+      dir => board[dir[0]][dir[1]]===ball)
+    .map(
+      dir => [dir[0]-coords[0], dir[1]-coords[1]]
+    );
 };
 
 module.exports = { initialState, enqueueSelectionStart, enqueueSelectionEnd, handleSelection, findPath, checkCell };
