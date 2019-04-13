@@ -5,6 +5,9 @@ const board = require('./board.js');
 
 // Constants
 const baseLevel = 5;
+const directions = [[-1, -1], [-1, 0], [-1, 1],
+                    [0, -1],  /* x */  [0, 1],
+                    [1, -1],  [1, 0],  [1, 1]];
 
 const initialState = () => ({
   board: board.setState(board.initialState()),
@@ -85,8 +88,9 @@ const findPath = state => {
       !('selectionEnd' in state))
     throw Error(`input object doesn't represent game state`);
 
-  const walkabilityMatrix = new PF.Grid(state.board.board
-    .map(row => row.map(item => item===0 ? item : 1)));
+  const walkabilityMatrix = new PF.Grid(
+    state.board.board.map(row => row.map(item => item===0 ? item : 1)));
+
   return new PF.AStarFinder({allowDiagonal: false})
     .findPath(
       state.selectionStart[0],
@@ -97,4 +101,8 @@ const findPath = state => {
   );
 };
 
-module.exports = { initialState, enqueueSelectionStart, enqueueSelectionEnd, handleSelection, findPath };
+const checkCell = (board, coords) => {
+
+};
+
+module.exports = { initialState, enqueueSelectionStart, enqueueSelectionEnd, handleSelection, findPath, checkCell };
