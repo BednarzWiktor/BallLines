@@ -455,7 +455,7 @@ describe('GAME', () => {
         coords3 = [3, 7];
 
         // directions:
-        directions1 = [[0, 1], [-1, 0], [0, 1], [1, -1]];
+        directions1 = [[0, -1], [-1, 0], [0, 1], [1, -1]];
         directions2 = [[-1, 0], [1, 0], [0, -1]];
         directions3 = [[-1, 0]];
       });
@@ -465,13 +465,12 @@ describe('GAME', () => {
         expect(analizeA(board3, coords1, directions1)).to.be.an('object');
       });
       it(`should be empty if at least one five ball long line wasn't found`, () => {
-        expect(analizeA(board3, coords1, directions3).length)
-          .to.be.equal(0);
+        expect(analizeA(board3, coords1, directions3))
+          .to.be.empty;
       });
       it('should have at least five long array for each returned key in object', () => {
-        expect(analizeA(board1, coords1, directions1)
-          .filter(line => line.length>=5))
-          .to.be.equal(analizeA(board1, coords1, directions1).length);
+        expect(analizeA(board1, coords1, directions1).horizontal.length)
+          .to.be.equal(5);
       });
       it('each object key should have valid name', () => {
         expect(analizeA(board1, coords1, directions1)).to.own.property('horizontal');

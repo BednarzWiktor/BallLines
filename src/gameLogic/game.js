@@ -130,7 +130,77 @@ const checkCell = (board, coords) => {
 };
 
 const analizeAxis = (board, coords, directions) => {
+  if (!Array.isArray(board) ||
+      !Array.isArray(coords) ||
+      !Array.isArray(directions))
+    throw Error('Wrong input, pass in proper parameters (array, array, array)');
+  if (board.length!==10)
+    throw Error(`board doesn't represent game board matrix`);
+  if (board.length!==board[0].length)
+    throw Error(`board doesn't represent game board matrix`);
+  if (coords.length!==2 ||
+      coords.filter(num => num>=0 && num<10).length!==2)
+    throw Error(`coords parameter needs to hold valid coords`);
+  if (directions.filter(dir => Array.isArray(dir) && dir.length===2 && Number.isInteger(dir[0]) && Number.isInteger(dir[1])).length!==directions.length)
+    throw Error(`directions parameter needs to hold valid directions`);
+  // inner recurring function finding consecutive balls of matching color in given direction
+  const innerFunc = (ball, board, coords, direction, output) => {
+    const y = coords[0]+direction[0],
+          x = coords[1]+direction[1];
 
+    if (board[y][x]===ball) {
+      let newOutput = output;
+      newOutput.push([y, x]);
+      return innerFunc(ball, board, [y, x], direction, newOutput);
+    }
+    return output;
+  };
+
+  const ball = board[coords[0]][coords[1]];
+
+  // creating object for all passed directions with lines of any length
+  const unfiltered = directions.reduce((result, dir) => {
+    if ((dir[0]===0 && dir[1]===-1) || (dir[0]===0 && dir[1]===1)) {
+      if ('horizontal' in result) {
+        result.horizontal = result.horizontal.concat(innerFunc(ball, board, coords, dir, []));
+      } else {
+        result.horizontal = [coords, ...innerFunc(ball, board, coords, dir, [])];
+      }
+      return result;
+    } else if ((dir[0]===-1 && dir[1]===0) || (dir[0]===1 && dir[1]===0)) {
+      if ('vertical' in result) {
+        result.vertical = result.vertical.concat(innerFunc(ball, board, coords, dir, []));
+      } else {
+        result.vertical = [coords, ...innerFunc(ball, board, coords, dir, [])];
+      }
+      return result;
+    } else if ((dir[0]===-1 && dir[1]===-1) || (dir[0]===1 && dir[1]===1)) {
+      if ('diagonal_LT_RB' in result) {
+        result.diagonal_LT_RB = result.diagonal_LT_RB.concat(innerFunc(ball, board, coords, dir, []));
+      } else {
+        result.diagonal_LT_RB = [coords, ...innerFunc(ball, board, coords, dir, [])];
+      }
+      return result;
+    } else if ((dir[0]===-1 && dir[1]===1) || (dir[0]===1 && dir[1]===-1)) {
+      if ('diagonal_RT_LB' in result) {
+        result.diagonal_RT_LB = result.diagonal_RT_LB.concat(innerFunc(ball, board, coords, dir, []));
+      } else {
+        result.diagonal_RT_LB = [coords, ...innerFunc(ball, board, coords, dir, [])];
+      }
+      return result;
+    }
+  }, {});
+
+  // filtering created object to include only lines with length 5 or more
+  const filtered = Object.keys(unfiltered).filter(key => unfiltered[key].length>=5);
+
+  const final = filtered.reduce((output, key) => {
+    output[key] = unfiltered[key];
+    return output;
+  }, {});
+
+  return final;
 };
 
+// Exports
 module.exports = { initialState, enqueueSelectionStart, enqueueSelectionEnd, handleSelection, findPath, checkCell, analizeAxis };
