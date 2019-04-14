@@ -5,9 +5,9 @@ const board = require('./board.js');
 
 // Constants
 const baseLevel = 5;
-const directions = [[-1, -1], [-1, 0], [-1, 1],
-                    [0, -1],  /* x */  [0, 1],
-                    [1, -1],  [1, 0],  [1, 1]];
+const directionsDict = [[-1, -1], [-1, 0], [-1, 1],
+                        [0, -1],  /* x */  [0, 1],
+                        [1, -1],  [1, 0],  [1, 1]];
 
 const initialState = () => ({
   board: board.setState(board.initialState()),
@@ -105,20 +105,16 @@ const checkCell = (board, coords) => {
   if (!Array.isArray(board) ||
       !Array.isArray(coords))
     throw Error('Wrong input, pass in proper parameters (array, array)');
-  // TEMPORARY ERROR HANDLER
-  if (board.length>0) {
-    if (Array.isArray(board[0])) {
-      if (board.length!==board[0].length) {
-        throw Error(`board doesn't represent game board matrix`);
-      }
-    }
-  }
+  if (board.length!==10)
+    throw Error(`board doesn't represent game board matrix`);
+  if (board.length!==board[0].length)
+    throw Error(`board doesn't represent game board matrix`);
   if (coords.length!==2 ||
       coords.filter(num => num>=0 && num<10).length!==2)
     throw Error(`coords parameter needs to hold valid coords`);
 
   const ball = board[coords[0]][coords[1]];
-  const adjustedDirections = directions
+  const adjustedDirections = directionsDict
     .map(
       dir => [dir[0]+coords[0], dir[1]+coords[1]])
     .filter(
@@ -133,4 +129,8 @@ const checkCell = (board, coords) => {
     );
 };
 
-module.exports = { initialState, enqueueSelectionStart, enqueueSelectionEnd, handleSelection, findPath, checkCell };
+const analizeAxis = (board, coords, directions) => {
+
+};
+
+module.exports = { initialState, enqueueSelectionStart, enqueueSelectionEnd, handleSelection, findPath, checkCell, analizeAxis };

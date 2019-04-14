@@ -223,40 +223,87 @@ describe('GAME', () => {
   });
 
   describe('checkCell', () => {
-    const directions = [[-1, -1], [-1, 0], [-1, 1],
-                        [0, -1],  /* x */  [0, 1],
-                        [1, -1],  [1, 0],  [1, 1]];
+    const directionsDict = [[-1, -1], [-1, 0], [-1, 1],
+                            [0, -1],  /* x */  [0, 1],
+                            [1, -1],  [1, 0],  [1, 1]];
+    const iS = gameMethods.initialState;
     const checkC = gameMethods.checkCell;
 
     context('Valid Input', () => {
-      let board1, board2, board3, coords1, coords2, coords3, coords4, coords5, coords6, coords7, coords8, coords9;
+      let board1 = iS().board.board,
+          board2 = iS().board.board,
+          board3= iS().board.board,
+         coords1, coords2, coords3, coords4, coords5, coords6, coords7, coords8, coords9;
 
       before(() => {
-        // UPDATE BOARD1-3 TO REPRESENT VALID 10x10 BOARD
-        board1 = [['r', 'r', 'g'],
+        /**************************
+          Clearing all board grids
+        **************************/
+        board1 = board1.map(row => row.map(item => item=0));
+        board2 = board2.map(row => row.map(item => item=0));
+        board3 = board3.map(row => row.map(item => item=0));
+        /*    Constructing testing subgrid:
+                 [['r', 'r', 'g'],
                   ['b', 'b', 'r'],
                   ['b', 'b', 'r']];
-        board2 = [[0, 0, 0],
+        */
+        board1[4][4] = 'r';
+        board1[4][5] = 'r';
+        board1[4][6] = 'g';
+        board1[5][4] = 'b';
+        board1[5][5] = 'b'; // <-- checkCell target
+        board1[5][6] = 'r';
+        board1[6][4] = 'b';
+        board1[6][5] = 'b';
+        board1[6][6] = 'r';
+
+        /*    Constructing testing subgrid:
+                  [[0, 0, 0],
                   [0, 'r', 0],
                   [0, 0, 0]];
-        board3 = [['r', 'r', 'r'],
+        */
+        board2[4][4] = 0;
+        board2[4][5] = 0;
+        board2[4][6] = 0;
+        board2[5][4] = 0;
+        board2[5][5] = 'r'; // <-- checkCell target
+        board2[5][6] = 0;
+        board2[6][4] = 0;
+        board2[6][5] = 0;
+        board2[6][6] = 0;
+
+        /*    Constructing testing subgrid:
+                 [['r', 'r', 'r'],
                   ['r', 'r', 'r'],
                   ['r', 'r', 'r']];
+        */
+        board3[4][4] = 'r';
+        board3[4][5] = 'r';
+        board3[4][6] = 'r';
+        board3[5][4] = 'r';
+        board3[5][5] = 'r'; // <-- checkCell target
+        board3[5][6] = 'r';
+        board3[6][4] = 'r';
+        board3[6][5] = 'r';
+        board3[6][6] = 'r';
 
+        /*******************
+          checkCell targets:
+        ********************/
         // Corners
-        coords1 = [0, 0];
-        coords2 = [0, 2];
-        coords3 = [2, 0];
-        coords4 = [2, 2];
+        coords1 = [4, 4];
+        coords2 = [4, 6];
+        coords3 = [6, 4];
+        coords4 = [6, 6];
 
         // Edges
-        coords5 = [0, 1];
-        coords6 = [1, 0];
-        coords7 = [2, 1];
-        coords8 = [1, 2];
+        coords5 = [4, 5];
+        coords6 = [5, 4];
+        coords7 = [6, 5];
+        coords8 = [5, 6];
 
         // Center
-        coords9 = [1, 1];
+        coords9 = [5, 5];
       });
 
       it('returns an array', () => {
@@ -271,9 +318,9 @@ describe('GAME', () => {
       });
       it('if balls of same color are in neighbour cells, it contains relative directions to found matches', () => {
         expect(checkC(board1, coords1).length).to.be.equal(1);
-        expect(checkC(board1, coords1)[0]).to.deep.equal(directions[4]);
+        expect(checkC(board1, coords1)[0]).to.deep.equal(directionsDict[4]);
         expect(checkC(board3, coords9).length).to.be.equal(8);
-        expect(checkC(board3, coords9)).to.deep.equal(directions);
+        expect(checkC(board3, coords9)).to.deep.equal(directionsDict);
       });
     });
 
@@ -282,7 +329,7 @@ describe('GAME', () => {
             h2 = () => checkC([], true),
             h3 = () => checkC(.5, 's'),
             h4 = () => checkC([[0, 0, 0], [0, 0]], [0, 0]),
-            h5 = () => checkC([[0, 0], [0, 0]], [11, 0]);
+            h5 = () => checkC(iS().board.board, [11, 0]);
 
       const handlers = [h1, h2, h3, h4, h5];
 
@@ -297,5 +344,172 @@ describe('GAME', () => {
         expect(handlers[4]).to.throw(`coords parameter needs to hold valid coords`);
       });
     });
-  })
+  });
+
+  describe(('analizeAxis'), () => {
+    const directionsDict = [[-1, -1], [-1, 0], [-1, 1],
+                            [0, -1],  /* x */  [0, 1],
+                            [1, -1],  [1, 0],  [1, 1]];
+    const iS = gameMethods.initialState;
+    const analizeA = gameMethods.analizeAxis;
+
+    context('Valid Input', () => {
+      let board1 = iS().board.board,
+          board2 = iS().board.board,
+          board3 = iS().board.board,
+          coords1, coords2, coords3, directions1, directions2, directions3;
+
+      before(() => {
+        /**************************
+          Clearing all board grids
+        **************************/
+        board1 = board1.map(row => row.map(item => item=0));
+        board2 = board2.map(row => row.map(item => item=0));
+        board3 = board3.map(row => row.map(item => item=0));
+
+        /*    Constructing testing subgrid:
+                 [[ 0,   0 , 'b',  'r',  0'],
+                  [ 0,   0,  'b',  0,   0],
+                  ['b', 'b', 'b', 'b', 'b'],
+                  [0,   'b', 'r', 'b', 'r'],
+                  ['b', 'r', 'r', 'b', 'r']];
+        */
+        board1[3][3] = 0;
+        board1[3][4] = 0;
+        board1[3][5] = 'b';
+        board1[3][6] = 'r';
+        board1[3][7] = 0;
+
+        board1[4][3] = 0;
+        board1[4][4] = 0;
+        board1[4][5] = 'b';
+        board1[4][6] = 0;
+        board1[4][7] = 0;
+
+        board1[5][3] = 'b';
+        board1[5][4] = 'b';
+        board1[5][5] = 'b';
+        board1[5][6] = 'b';
+        board1[5][7] = 'b';
+
+        board1[6][3] = 0;
+        board1[6][4] = 'b';
+        board1[6][5] = 'r';
+        board1[6][6] = 'b';
+        board1[6][7] = 'r';
+
+        board1[7][3] = 'b';
+        board1[7][4] = 'r';
+        board1[7][5] = 'r';
+        board1[7][6] = 'b';
+        board1[7][7] = 'r';
+        /*    Constructing testing subgrid:
+                 [[ 0,   0,   0,   0,  'b'],
+                  [ 0,   0,   0,   0,  'b'],
+                  ['b', 'b', 'b', 'b', 'b'],
+                  [ 0,   0,   0,   0,  'b'],
+                  [ 0,   0,   0,   0,  'b']];
+        */
+        board2[3][3] = 0;
+        board2[3][4] = 0;
+        board2[3][5] = 0;
+        board2[3][6] = 0;
+        board2[3][7] = 'b';
+
+        board2[4][3] = 0;
+        board2[4][4] = 0;
+        board2[4][5] = 0;
+        board2[4][6] = 0;
+        board2[4][7] = 'b';
+
+        board2[5][3] = 'b';
+        board2[5][4] = 'b';
+        board2[5][5] = 'b';
+        board2[5][6] = 'b';
+        board2[5][7] = 'b';
+
+        board2[6][3] = 0;
+        board2[6][4] = 0;
+        board2[6][5] = 0;
+        board2[6][6] = 0;
+        board2[6][7] = 'b';
+
+        board2[7][3] = 0;
+        board2[7][4] = 0;
+        board2[7][5] = 0;
+        board2[7][6] = 0;
+        board2[7][7] = 'b';
+        /*    Constructing testing subgrid:
+                 [[ 0,   0,   0,   0,  0],
+                  [ 0,   0,  'b',   0,  0],
+                  [ 0,   0,  'b',  0,  0],
+                  [ 0,   0,   0,   0,  0],
+                  [ 0,   0,   0,   0,  0];
+        */
+        board3[4][5] = 'b'
+        board3[5][5] = 'b';
+
+        // target coords:
+        coords1 = [5, 5];
+        coords2 = [5, 7];
+        coords3 = [3, 7];
+
+        // directions:
+        directions1 = [[0, 1], [-1, 0], [0, 1], [1, -1]];
+        directions2 = [[-1, 0], [1, 0], [0, -1]];
+        directions3 = [[-1, 0]];
+      });
+
+      it('returns an object', () => {
+        expect(analizeA(board1, coords1, directions1)).to.be.an('object');
+        expect(analizeA(board3, coords1, directions1)).to.be.an('object');
+      });
+      it(`should be empty if at least one five ball long line wasn't found`, () => {
+        expect(analizeA(board3, coords1, directions3).length)
+          .to.be.equal(0);
+      });
+      it('should have at least five long array for each returned key in object', () => {
+        expect(analizeA(board1, coords1, directions1)
+          .filter(line => line.length>=5))
+          .to.be.equal(analizeA(board1, coords1, directions1).length);
+      });
+      it('each object key should have valid name', () => {
+        expect(analizeA(board1, coords1, directions1)).to.own.property('horizontal');
+        expect(analizeA(board2, coords2, directions2)).to.own.property('horizontal');
+        expect(analizeA(board2, coords2, directions2)).to.own.property('vertical');
+      });
+      it('each object key should contain array of only valid coords', () => {
+        expect(analizeA(board1, coords1, directions1).horizontal
+          .filter(coord => coord
+            .filter(num => num>=0 && num<10).length===2).length)
+        .to.be.equal(analizeA(board1, coords1, directions1).horizontal.length);
+      });
+    });
+
+    context('Edge Cases', () => {
+      const h1 = () => analizeA(true, [], []),
+            h2 = () => analizeA([], .5, []),
+            h3 = () => analizeA([], [], 's'),
+            h4 = () => analizeA(1, 's', false),
+            h5 = () => analizeA([[2, 2], [1, 1]], [], []),
+            h6 = () => analizeA(iS().board.board, [1, -2], []),
+            h7 = () => analizeA(iS().board.board, [0, 0], [[12, 's']]);
+
+      const handlers = [h1, h2, h3, h4, h5, h6, h7];
+
+      it(`throws an error if parameters don't correspond to (array, array, array)`, () => {
+        testTaskError(handlers, Error);
+        testTaskError(handlers.slice(0, 4), 'Wrong input, pass in proper parameters (array, array, array)');
+      });
+      it(`throws an error if board parameter doesn't represent a game board`, () => {
+        expect(handlers[4]).to.throw(`board doesn't represent game board matrix`);
+      });
+      it(`throws an error if coords parameter doesn't hold valid coords`, () => {
+        expect(handlers[5]).to.throw(`coords parameter needs to hold valid coords`);
+      });
+      it(`throws an error if directions parameter doesn't hold valid directions`, () => {
+        expect(handlers[6]).to.throw(`directions parameter needs to hold valid directions`);
+      });
+    });
+  });
 });
