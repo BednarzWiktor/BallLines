@@ -160,28 +160,28 @@ const analizeAxis = (board, coords, directions) => {
 
   // creating object for all passed directions with lines of any length
   const unfiltered = directions.reduce((result, dir) => {
-    if ((dir[0]===0 && dir[1]===-1) || (dir[0]===0 && dir[1]===1)) {
+    if ((dir[0]===0 && dir[1]===-1) || (dir[0]===0 && dir[1]===1)) { // x axis
       if ('horizontal' in result) {
         result.horizontal = result.horizontal.concat(innerFunc(ball, board, coords, dir, []));
       } else {
         result.horizontal = [coords, ...innerFunc(ball, board, coords, dir, [])];
       }
       return result;
-    } else if ((dir[0]===-1 && dir[1]===0) || (dir[0]===1 && dir[1]===0)) {
+    } else if ((dir[0]===-1 && dir[1]===0) || (dir[0]===1 && dir[1]===0)) { // y axis
       if ('vertical' in result) {
         result.vertical = result.vertical.concat(innerFunc(ball, board, coords, dir, []));
       } else {
         result.vertical = [coords, ...innerFunc(ball, board, coords, dir, [])];
       }
       return result;
-    } else if ((dir[0]===-1 && dir[1]===-1) || (dir[0]===1 && dir[1]===1)) {
+    } else if ((dir[0]===-1 && dir[1]===-1) || (dir[0]===1 && dir[1]===1)) { // x/y axis
       if ('diagonal_LT_RB' in result) {
         result.diagonal_LT_RB = result.diagonal_LT_RB.concat(innerFunc(ball, board, coords, dir, []));
       } else {
         result.diagonal_LT_RB = [coords, ...innerFunc(ball, board, coords, dir, [])];
       }
       return result;
-    } else if ((dir[0]===-1 && dir[1]===1) || (dir[0]===1 && dir[1]===-1)) {
+    } else if ((dir[0]===-1 && dir[1]===1) || (dir[0]===1 && dir[1]===-1)) { // -x/y axis
       if ('diagonal_RT_LB' in result) {
         result.diagonal_RT_LB = result.diagonal_RT_LB.concat(innerFunc(ball, board, coords, dir, []));
       } else {
@@ -202,5 +202,65 @@ const analizeAxis = (board, coords, directions) => {
   return final;
 };
 
+const setScore = (state, axis) => {
+  if (typeof state !== 'object' ||
+      typeof axis !== 'object')
+    throw Error('Wrong input, pass in proper parameters (object, object)');
+  if (!('board' in state) ||
+      !('nextLevel' in state) ||
+      !('score' in state) ||
+      !('selectionStart' in state) ||
+      !('selectionEnd' in state))
+    throw Error(`state parameter needs to hold valid game state object`);
+  if (
+    Object.keys(axis)
+      .filter( a => a==='horizontal' ||
+                    a==='vertical' ||
+                    a==='diagonal_LT_RB' ||
+                    a==='diagonal_RT_LB').length !==
+    Object.keys(axis).length
+  )
+    throw Error(`axis parameter needs to hold valid axis object`);
+
+
+  const prevState = Object.assign({}, {
+    board: state.board,
+    nextLevel: state.nextLevel,
+    score: state.score,
+    selectionStart: state.selectionStart,
+    selectionEnd: state.selectionEnd
+  });
+  const length = Object.keys(axis)
+    .reduce((sum, a) => {
+      sum+=axis[a].length;
+      return sum;
+    }, 0)
+  const scoreIncrement = length>5 ? 5*(length-4) : 5;
+  return Object.assign(prevState, {
+    score: (prevState.score+scoreIncrement)
+  });
+};
+
+const passedTurn = state => {
+  if (typeof state !== 'object')
+    throw Error('Wrong input, pass in proper parameter (object)');
+  if (!('board' in state) ||
+      !('nextLevel' in state) ||
+      !('score' in state) ||
+      !('selectionStart' in state) ||
+      !('selectionEnd' in state))
+    throw Error(`state parameter needs to hold valid game state object`);
+  if (state.nextLevel<1)
+    throw Error(`state.nextLevel can't be lower than 1, make sure to initiate new game state with next level`)
+
+  return Object.assign({}, {
+    board: state.board,
+    score: state.score,
+    nextLevel: state.nextLevel-1,
+    selectionStart: state.selectionStart,
+    selectionEnd: state.selectionEnd
+  });
+};
+
 // Exports
-module.exports = { initialState, enqueueSelectionStart, enqueueSelectionEnd, handleSelection, findPath, checkCell, analizeAxis };
+module.exports = { initialState, enqueueSelectionStart, enqueueSelectionEnd, handleSelection, findPath, checkCell, analizeAxis, setScore, passedTurn };

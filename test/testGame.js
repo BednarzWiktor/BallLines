@@ -511,4 +511,132 @@ describe('GAME', () => {
       });
     });
   });
+
+  describe('setScore', () => {
+    const iS = gameMethods.initialState;
+    const setS = gameMethods.setScore;
+
+    context('Valid Input', () => {
+      let state1, state2, axis1, axis2, axis3;
+
+      before(() => {
+        state1 = iS();
+        state2 = iS();
+        state2.score = 10;
+
+        axis1 = {
+          horizontal: [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4]]
+        };
+        axis2 = {
+          horizontal: [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6]]
+        }
+        axis3 = {
+          horizontal: [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4]],
+          vertical: [[0, 4], [1, 4], [2, 4], [3, 4], [4, 4]]
+        };
+      });
+
+      it('should return an object', () => {
+        expect(setS(state1, axis1)).to.be.an('object');
+        expect(setS(state2, axis3)).to.be.an('object');
+      });
+      it('should return a valid game state object', () => {
+        expect(setS(state1, axis1)).to.own.property('board');
+        expect(setS(state1, axis1)).to.own.property('nextLevel');
+        expect(setS(state1, axis1)).to.own.property('score');
+        expect(setS(state1, axis1)).to.own.property('selectionStart');
+        expect(setS(state1, axis1)).to.own.property('selectionEnd');
+
+        expect(setS(state2, axis3)).to.own.property('board');
+        expect(setS(state2, axis3)).to.own.property('nextLevel');
+        expect(setS(state2, axis3)).to.own.property('score');
+        expect(setS(state2, axis3)).to.own.property('selectionStart');
+        expect(setS(state2, axis3)).to.own.property('selectionEnd');
+      });
+      it('properly adds score with five balls long lines', () => {
+        expect(setS(state1, axis1).score).to.be.equal(5);
+        expect(setS(state2, axis1).score).to.be.equal(15);
+      });
+      it('properly adds score with more than five balls long lines', () => {
+        expect(setS(state1, axis2).score).to.be.equal(15);
+        expect(setS(state2, axis2).score).to.be.equal(25);
+        expect(setS(state1, axis3).score).to.be.equal(30);
+        expect(setS(state2, axis3).score).to.be.equal(40);
+      });
+    });
+
+    context('Edge Cases', () => {
+      const h1 = () => setS(true, {}),
+            h2 = () => setS({}, 1),
+            h3 = () => setS('s', .5),
+            h4 = () => setS({someKey: 1}, {}),
+            h5 = () => setS(iS(), { someKey: [] });
+
+      const handlers = [h1, h2, h3, h4, h5];
+
+      it(`throws an error if parameters don't correspond to (object, object)`, () => {
+        testTaskError(handlers, Error);
+        testTaskError(handlers.slice(0, 3), 'Wrong input, pass in proper parameters (object, object)')
+      });
+      it(`throws an error if state parameter doesn't represent game state`, () => {
+        expect(handlers[3]).to.throw(`state parameter needs to hold valid game state object`);
+      });
+      it(`throws an error if pending doesn't represent valid axis object`, () => {
+        expect(handlers[4]).to.throw(`axis parameter needs to hold valid axis object`);
+      });
+    });
+  });
+
+  describe('passedTurn', () => {
+    const iS = gameMethods.initialState;
+    const pT = gameMethods.passedTurn;
+
+    context('Valid Input', () => {
+      let state1, state2;
+
+      before(() => {
+        state1 = iS();
+        state2 = iS();
+        state2.nextLevel = 1;
+      });
+
+      it('return an object', () => {
+        expect(pT(state1)).to.be.an('object');
+        expect(pT(state2)).to.be.an('object');
+      });
+      it('is a valid game state object', () => {
+        expect(pT(state1)).to.own.property('board');
+        expect(pT(state1)).to.own.property('nextLevel');
+        expect(pT(state1)).to.own.property('score');
+        expect(pT(state1)).to.own.property('selectionStart');
+        expect(pT(state1)).to.own.property('selectionEnd');
+      });
+      it('decrements nextLevel value of input state by 1', () => {
+        expect(pT(state1).nextLevel).to.be.equal(state1.nextLevel-1);
+        expect(pT(state2).nextLevel).to.be.equal(0);
+      });
+    });
+
+    context('Edge Cases', () => {
+      let state = iS();
+      state.nextLevel=0;
+
+      const h1 = () => pT(1),
+            h2 = () => pT({someKey: 1}),
+            h3 = () => pT(state);
+
+      const handlers = [h1, h2, h3];
+
+      it(`throws an error if state parameter isn't an object`, () => {
+        testTaskError(handlers, Error);
+        expect(handlers[0]).to.throw('Wrong input, pass in proper parameter (object)');
+      });
+      it(`throws an error if state parameter doesn't represent game state`, () => {
+        expect(handlers[1]).to.throw(`state parameter needs to hold valid game state object`);
+      });
+      it(`throws an error if input state.nextLevel is equal to 0`, () => {
+        expect(handlers[2]).to.throw(`state.nextLevel can't be lower than 1, make sure to initiate new game state with next level`);
+      });
+    });
+  })
 });
