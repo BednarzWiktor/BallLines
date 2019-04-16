@@ -1,3 +1,4 @@
+'use strict';
 // Constants
 const size = 10;
 const balls = ['r', 'g', 'b', 'y', 'c', 'm', 'o', 's', 'b'];
