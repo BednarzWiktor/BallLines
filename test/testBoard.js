@@ -13,7 +13,6 @@ describe('BOARD', () => {
   // Tests
   describe('generateBoard', () => {
     const genB = boardMethods.generateBoard;
-    console.log(genB);
 
     it('should return a 2d array', () => {
       expect(genB()).to.be.an('array'); // is an array
@@ -371,7 +370,6 @@ describe('BOARD', () => {
   describe('updateBoard', () => {
     const updateB = boardMethods.updateBoard;
     const genB = boardMethods.generateBoard;
-    console.log(genB);
 
     context('Valid Input', () => {
       context('add', () => {
