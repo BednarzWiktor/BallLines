@@ -1,7 +1,7 @@
 const expect = require('chai').expect;
 
 describe('GAME', () => {
-  const gameMethods = require('../src/gameLogic/game.js');
+  const gameMethods = require('../src/gameLogic/game.js').game;
 
   // Task Runners
   const testTaskError = (handlers, expectation) => {
@@ -93,7 +93,7 @@ describe('GAME', () => {
       const h1 = () => enqSE(1, []),
             h2 = () => enqSE({}, 's'),
             h3 = () => enqSE(true, 1),
-            h4 = () => enqSE(initS(), ['s', true]);
+            h4 = () => enqSE(initS(), ['s', true, 2]);
 
       const handlers = [h1, h2, h3, h4];
 
