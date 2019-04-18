@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 // Imports
 const PF = require('pathfinding');
 const board = require('./board.js');
