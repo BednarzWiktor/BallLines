@@ -8,5 +8,9 @@ module.exports = {
     filename: 'balllines.js',
     library: 'balllines',
     libraryTarget: 'umd'
+  },
+  externals: {
+    pathfinding: 'pathfinding',
+    root: '_'
   }
 }
