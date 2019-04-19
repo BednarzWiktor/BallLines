@@ -91,6 +91,8 @@ Each method can be either a state setter or a functional method.
 **State setters** always return a new, updated state of either board or game state entity.
 **Functional methods** returns an intermediate data needed for further processing or as an input parameter for a *state setter*
 
+---- IN PROGRESS ----
+
 ### Public board Methods
 
 #### State Setters
